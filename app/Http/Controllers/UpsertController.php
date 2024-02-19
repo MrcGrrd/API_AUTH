@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class UpsertController extends Controller
     public function index()
     {
             // $users = DB::select("exec sp_select_all");
-            $users = DB::select("exec sp_ref_zone_upsert 'Load'");
+            $users = User::get();
   
         return response()->json([
             'results' => $users
@@ -40,7 +41,7 @@ class UpsertController extends Controller
 
     public function show()
     {
-        return Auth::user()->USERCODE;
+        return Auth::user()->email;
     }
     
     

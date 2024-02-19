@@ -15,35 +15,37 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         return User::create([
-            'USER_CODE' => $request->input('UserCode'),
-            'USER_NAME' => $request->input('UserName'),
-            'PASSWORD' => Hash::make($request->input('password')),
-            'USER_TYPE' => $request->input('UserType'),
-            'EMAIL_ADD' => $request->input('Email')
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
         ]);
     }
 
     public function login(Request $request)
     {  
         
-         $user = User::where('USER_CODE', $request->UserCode)->first();
+        $user = User::where('email', $request->email)->first();
 
-        if ($user && Hash::check($request->password, $user->PASSWORD)) {
+        if ($user && Hash::check($request->password, $user->password)) {
             Auth::login($user);
 
-         $user = Auth::user();
+            $user = Auth::user();
 
-         $token = $user->createToken('token')->plainTextToken;
+            $token = $user->createToken('token')->plainTextToken;
 
-         $cookie = cookie('jwt', $token, 68 * 24);
+            $cookie = cookie('jwt', $token, 68 * 24);
 
-         DB::insert('update users set token = ? where USER_CODE = ?', [$token, $request->UserCode]);
+            // DB::insert('update users set token = ? where USER_CODE = ?', [$token, $request->UserCode]);
 
-          return response([
-              'message' => $token
-          ])->withCookie($cookie);
+            return response([
+                'message' => $token
+            ])->withCookie($cookie);
 
         }
+
+        return response()->json([
+            'message' => 'Incorrect Credentials'
+        ], 401);
     }
 
     public function logout()
